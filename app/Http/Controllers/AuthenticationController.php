@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use App\ResponseFormatter;
+use App\Services\AuthenticationService;
+use Illuminate\Http\Request;
+
+class AuthenticationController extends Controller
+{
+    protected $authenticationService;
+
+    public function __construct(AuthenticationService $service)
+    {
+        $this->authenticationService = $service;
+    }
+
+    public function register()
+    {
+        $validator = \Validator::make(request()->all(), [
+            'name' => 'required|min:5|max:100',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:3|confirmed',
+            'username' => 'required|unique:host_details,username',
+            'service_type' => 'required|exists:service_types,uuid',
+            'meet_location' => 'required|max:100',
+            'meet_timezone' => 'required|max:2',
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error(400, $validator->errors());
+        }
+
+        $payload = $validator->validated();
+        $this->authenticationService->registerUser($payload);
+
+        return ResponseFormatter::success([
+            'is_sent' => true
+        ]);
+    }
+
+    public function resendOtp()
+    {
+        $validator = \Validator::make(request()->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error(400, $validator->errors());
+        }
+
+        $user = User::where('email', request()->email)->first();
+        if (is_null($user)) {
+            return ResponseFormatter::error(400, null, [
+                'User tidak ditemukan!'
+            ]);
+        }
+
+        $this->authenticationService->resendOtp($user);
+
+        return ResponseFormatter::success([
+            'is_sent' => true
+        ]);
+    }
+}
