@@ -67,4 +67,49 @@ class AuthenticationService
 
         Mail::to($user->email)->send(new \App\Mail\SendRegisterOTP($user, $otp));
     }
+
+    public function verifyOtp(string $email, string $otp)
+    {
+        $user = User::whereNull('email_verified_at')->where('email', $email)->first();
+        if (is_null($user)) {
+            return false;
+        }
+
+        $otpCheck = $user->otps()->where('type', 'registration')
+            ->where('otp', $otp)
+            ->where('is_active', true)
+            ->where('expired_at', '>=', now())
+            ->first();
+
+        if (is_null($otpCheck)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function verifyRegister(string $email, string $otp)
+    {
+        $user = User::whereNull('email_verified_at')->where('email', $email)->first();
+        if (is_null($user)) {
+            return false;
+        }
+
+        $otpCheck = $user->otps()->where('type', 'registration')
+            ->where('otp', $otp)
+            ->where('is_active', true)
+            ->where('expired_at', '>=', now())
+            ->first();
+
+        if (is_null($otpCheck)) {
+            return false;
+        }
+
+        $otpCheck->delete();
+        $user->update([
+            'email_verified_at' => now()
+        ]);
+
+        return $user->createToken(config('app.name'))->plainTextToken;
+    }
 }

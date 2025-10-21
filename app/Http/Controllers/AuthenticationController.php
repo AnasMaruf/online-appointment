@@ -63,4 +63,42 @@ class AuthenticationController extends Controller
             'is_sent' => true
         ]);
     }
+
+    public function verifyOtp()
+    {
+        $validator = \Validator::make(request()->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error(400, $validator->errors());
+        }
+
+        if ($this->authenticationService->verifyOtp(request()->email, request()->otp)) {
+            return ResponseFormatter::success([
+                'is_correct' => true
+            ]);
+        }
+
+        return ResponseFormatter::error(400, 'Invalid OTP');
+    }
+
+    public function verifyRegister()
+    {
+        $validator = \Validator::make(request()->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error(400, $validator->errors());
+        }
+
+        if ($token = $this->authenticationService->verifyRegister(request()->email, request()->otp)) {
+            return ResponseFormatter::success([
+                'token' => $token
+            ]);
+        }
+
+        return ResponseFormatter::error(400, 'Invalid OTP');
+    }
 }
