@@ -101,4 +101,26 @@ class AuthenticationController extends Controller
 
         return ResponseFormatter::error(400, 'Invalid OTP');
     }
+
+    public function login()
+    {
+        if ($token = $this->authenticationService->login(request()->email, request()->password)) {
+            return ResponseFormatter::success([
+                'token' => $token
+            ]);
+        }
+
+        return ResponseFormatter::error(400, null, [
+            'Email atau Password salah!'
+        ]);
+    }
+
+    public function logout()
+    {
+        auth()->user()->tokens()->delete();
+
+        return ResponseFormatter::success([
+            'logout_success' => true
+        ]);
+    }
 }

@@ -109,6 +109,19 @@ class AuthenticationService
         $user->update([
             'email_verified_at' => now()
         ]);
+        return $user->createToken(config('app.name'))->plainTextToken;
+    }
+
+    public function login(string $email, string $password)
+    {
+        $user = User::where('email', $email)->whereNotNull('email_verified_at')->first();
+        if (is_null($user)) {
+            return false;
+        }
+
+        if (!\Hash::check($password, $user->password)) {
+            return false;
+        }
 
         return $user->createToken(config('app.name'))->plainTextToken;
     }
