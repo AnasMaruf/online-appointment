@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Models\Host\Availability;
 use App\Models\Host\HostDetail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -58,5 +59,10 @@ class User extends Authenticatable
     public function hostDetail()
     {
         return $this->hasOne(HostDetail::class);
+    }
+
+    public function availabilities()
+    {
+        return $this->hasMany(Availability::class, 'host_id');
     }
 }
