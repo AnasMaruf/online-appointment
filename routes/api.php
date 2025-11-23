@@ -13,7 +13,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/verify-register', [AuthenticationController::class, 'verifyRegister']);
 
 
-    Route::post('/login', [AuthenticationController::class, 'login']);
+    Route::post('/login', [AuthenticationController::class, 'login'])->name('login');
     Route::post('/logout', [AuthenticationController::class, 'logout'])->middleware('auth:sanctum');
 
     Route::prefix('forgot-password')->group(function () {
