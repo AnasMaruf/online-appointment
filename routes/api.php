@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,5 +28,9 @@ Route::prefix('v1')->group(function () {
 
         Route::get('availabilities', [AvailabilityController::class, 'index']);
         Route::post('availabilities', [AvailabilityController::class, 'upsert']);
+
+        Route::get('summary', [ProfileController::class, 'getSummary']);
+        Route::get('profile', [ProfileController::class, 'getProfile']);
+        Route::post('profile', [ProfileController::class, 'updateProfile']);
     });
 });
